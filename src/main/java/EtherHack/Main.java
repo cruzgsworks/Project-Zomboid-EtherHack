@@ -11,7 +11,10 @@ public class Main {
 
         GamePatcher gamePatcher = new GamePatcher();
         switch (args[0]) {
-            case "--install" -> gamePatcher.patchGame();
+            case "--install" -> {
+                gamePatcher.backupGameFiles();
+                gamePatcher.patchGame();
+            }
             case "--uninstall" -> gamePatcher.restoreFiles();
             default -> Logger.print("Unknown flag " + "'" + args[0] + "'");
         }

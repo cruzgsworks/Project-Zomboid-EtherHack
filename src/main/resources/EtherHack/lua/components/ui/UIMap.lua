@@ -84,8 +84,9 @@ function UIMap:render()
 	-- Отрисовка машин
 	if isMapDrawVehicles() then
 		local vehicles = getCell():getVehicles()
-		for i=1,vehicles:size() do
-			local vehicle = vehicles:get(i-1)
+		local iter = vehicles:iterator()
+		while iter:hasNext() do
+			local vehicle = iter:next()
 
 			local x = self.mapAPI:worldToUIX(vehicle:getX(), vehicle:getY());
 			local y = self.mapAPI:worldToUIY(vehicle:getX(), vehicle:getY());

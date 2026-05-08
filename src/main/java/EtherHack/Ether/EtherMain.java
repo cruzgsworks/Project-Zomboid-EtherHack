@@ -1,5 +1,6 @@
 package EtherHack.Ether;
 
+import EtherHack.utils.EventSubscriber;
 import EtherHack.utils.Logger;
 
 public class EtherMain {
@@ -8,6 +9,7 @@ public class EtherMain {
    public EtherCredits etherCredits;
    public EtherLuaManager etherLuaManager;
    public EtherAPI etherAPI;
+   private PlayerUpdateHandler playerUpdateHandler;
 
    private EtherMain() {
    }
@@ -21,6 +23,12 @@ public class EtherMain {
       this.etherAPI.loadAPI();
       this.etherLuaManager = new EtherLuaManager();
       this.etherLuaManager.loadLua();
+      
+      // Register event handlers
+      this.playerUpdateHandler = PlayerUpdateHandler.getInstance();
+      EventSubscriber.register(this.playerUpdateHandler);
+      Logger.printLog("Registered PlayerUpdateHandler for stat modifications");
+      
       Logger.printLog("Initialization EtherHack was completed!");
    }
 

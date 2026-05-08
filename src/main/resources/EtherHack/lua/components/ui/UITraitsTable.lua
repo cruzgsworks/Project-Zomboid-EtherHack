@@ -49,11 +49,34 @@ function UITraitsTable:createChildren()
     self:addChild(self.addTrait);
     table.insert(self.buttonList, self.addTrait);
 
-    self.deleteTrait = UIButton:new(self.addTrait.x + self.addTrait.width + 10, self.height - 80, 100, 24, getTranslate("UI_PlayerEditor_PlayerTraits_DeleteTrait"), 
-    function() 
-        self.localPlayer:getTraits():remove(self.datas.items[self.datas.selected].item:getType());
-        SyncXp(self.localPlayer);
-        self:updateTraits();
+    self.deleteTrait = UIButton:new(self.addTrait.x + self.addTrait.width + 10, self.height - 80, 100, 24, getTranslate("UI_PlayerEditor_PlayerTraits_DeleteTrait"),
+    function()
+        if not self.localPlayer or not self.datas.selected or self.datas.selected < 1 then
+            return
+        end
+        
+        local selectedItem = self.datas.items[self.datas.selected]
+        if not selectedItem or not selectedItem.item then
+            return
+        end
+        
+        -- PZ 42.x uses CharacterTraits
+        if self.localPlayer.getCharacterTraits then
+            local charTraits = self.localPlayer:getCharacterTraits()
+            if charTraits then
+                charTraits:remove(selectedItem.item)
+                SyncXp(self.localPlayer)
+                self:updateTraits()
+            end
+            return
+        end
+        
+        -- PZ 41.x uses old getTraits()
+        if self.localPlayer.getTraits and self.localPlayer:getTraits() then
+            self.localPlayer:getTraits():remove(selectedItem.item:getType())
+            SyncXp(self.localPlayer)
+            self:updateTraits()
+        end
     end)
     self.deleteTrait:initialise();
     self.deleteTrait:instantiate();
@@ -76,14 +99,45 @@ function UITraitsTable:updateTraits()
     self.lastSelectedIndex = self.datas.selected or 0;
     self.datas:clear();
 
-    for i=0, self.localPlayer:getTraits():size() - 1 do
-        local trait = TraitFactory.getTrait(self.localPlayer:getTraits():get(i));
-        if trait ~= nil then
-            if trait:getTexture() then
-                self.datas:addItem(trait:getLabel(), trait);
+    if not self.localPlayer then
+        return
+    end
+    
+    -- PZ 42.x uses CharacterTraits system
+    if self.localPlayer.getCharacterTraits then
+        local charTraits = self.localPlayer:getCharacterTraits()
+        if charTraits then
+            local knownTraits = charTraits:getKnownTraits()
+            if knownTraits then
+                for i=0, knownTraits:size() - 1 do
+                    local trait = knownTraits:get(i)
+                    if trait ~= nil then
+                        -- Store CharacterTrait object; drawDatas will look up definition
+                        self.datas:addItem(trait:getName(), trait);
+                    end
+                end
+            end
+        end
+        self.datas.selected = self.lastSelectedIndex;
+        return
+    end
+    
+    -- Fallback to old getTraits() method (PZ 41.x)
+    if self.localPlayer.getTraits then
+        local traits = self.localPlayer:getTraits()
+        if traits then
+            for i=0, traits:size() - 1 do
+                local traitName = traits:get(i)
+                local trait = TraitFactory.getTrait(traitName);
+                if trait ~= nil then
+                    if trait:getTexture() then
+                        self.datas:addItem(trait:getLabel(), trait);
+                    end
+                end
             end
         end
     end
+    
     self.datas.selected = self.lastSelectedIndex;
 end
 
@@ -92,12 +146,18 @@ end
 --*********************************************************
 function UITraitsTable:update()
     self.datas.doDrawItem = self.drawDatas;
+    
+    -- Check if traits are available (either old getTraits or new getCharacterTraits)
+    local traitsAvailable = self.localPlayer and (self.localPlayer.getTraits or self.localPlayer.getCharacterTraits)
+    
     for i=1, #self.buttonList do
         local item = self.buttonList[i];
-        if item.isOnlyInGame and self.localPlayer == nil or self.localPlayer:isDead() then
+        -- Disable trait buttons if no trait API available
+        if not traitsAvailable then
             item:setEnable(false);
-        end
-        if (not self.datas.items[self.datas.selected] or #self.datas.items < 1) and item.isRequireSelected then
+        elseif item.isOnlyInGame and (self.localPlayer == nil or self.localPlayer:isDead()) then
+            item:setEnable(false);
+        elseif (not self.datas.items[self.datas.selected] or #self.datas.items < 1) and item.isRequireSelected then
             item:setEnable(false);
         else
             item:setEnable(true);
@@ -141,37 +201,60 @@ function UITraitsTable:drawDatas(y, item, alt)
     local clipY = math.max(0, y + self:getYScroll())
     local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
 
-    -- Устанавливаем маску для первого столбца
+    -- Look up CharacterTraitDefinition for PZ 42.x traits
+    local traitDef = nil
+    local isPZ42Trait = false
+    if item.item then
+        -- Check if this is a PZ 42.x CharacterTrait (has getName but not getLabel)
+        if item.item.getName and not item.item.getLabel then
+            isPZ42Trait = true
+            -- Try to get definition from CharacterTraitDefinition
+            if CharacterTraitDefinition and CharacterTraitDefinition.getCharacterTraitDefinition then
+                traitDef = CharacterTraitDefinition.getCharacterTraitDefinition(item.item)
+            end
+        elseif item.item.getLabel then
+            -- PZ 41.x TraitFactory trait
+            traitDef = item.item
+        end
+    end
+
+    -- Draw item text
     self:suspendStencil()
     self:clampStencilRectToParent(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
-    self:drawText(item.item:getLabel(), 25, y + 4, 1, 1, 1, 1, UIFont.Small);
-    -- Удаляем маску
+    local text = item.text or "Unknown"
+    if traitDef and traitDef.getLabel then
+        text = traitDef:getLabel()
+    end
+    self:drawText(text, 25, y + 4, 1, 1, 1, 1, UIFont.Small);
     self:clearStencilRect()
     self:resumeStencil()
 
-    local descrtiption = item.item:getDescription():gsub("\n", "; ")
+    -- Draw description
+    local description = ""
+    if traitDef and traitDef.getDescription then
+        description = traitDef:getDescription():gsub("\n", "; ")
+    end
     
-    -- Устанавливаем маску для второго столбца
     self:suspendStencil()
     self:clampStencilRectToParent(self.columns[2].size, clipY, self.width - self.columns[2].size - scrollBarOffset, clipY2 - clipY)
-    self:drawText(descrtiption, self.columns[2].size + 10, y + 4, 1, 1, 1, 1, UIFont.Small);
-    -- Удаляем маску
+    self:drawText(description, self.columns[2].size + 10, y + 4, 1, 1, 1, 1, UIFont.Small);
     self:clearStencilRect()
     self:resumeStencil()
 
     self:repaintStencilRect(0, clipY, self.width - scrollBarOffset, clipY2 - clipY)
 
+    -- Draw texture from definition
     local iconX = 4
     local iconSize = fontHeightSmall;
-
-    local texture = item.item:getTexture()
-    if texture then
-        self:suspendStencil()
-        self:clampStencilRectToParent(self.columns[1].size + iconX, clipY, iconSize, clipY2 - clipY)
-        self:drawTextureScaledAspect2(texture, self.columns[1].size + iconX, y + (self.itemheight - iconSize) / 2, iconSize, iconSize,  1, 1, 1, 1);
-        self:clearStencilRect()
-        self:resumeStencil()
-
+    if traitDef and traitDef.getTexture then
+        local texture = traitDef:getTexture()
+        if texture then
+            self:suspendStencil()
+            self:clampStencilRectToParent(self.columns[1].size + iconX, clipY, iconSize, clipY2 - clipY)
+            self:drawTextureScaledAspect2(texture, self.columns[1].size + iconX, y + (self.itemheight - iconSize) / 2, iconSize, iconSize,  1, 1, 1, 1);
+            self:clearStencilRect()
+            self:resumeStencil()
+        end
     end
     return y + self.itemheight;
 end

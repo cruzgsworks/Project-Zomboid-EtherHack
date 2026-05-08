@@ -75,39 +75,104 @@ function EtherPlayerEditor:createChildren()
 	self.avatarPanel:setIsometric(false)
 	self:addChild(self.avatarPanel)
 
-    self:addLabel(getText("IGUI_PlayerStats_Username") .. " ".. self.localPlayer:getUsername(), 90, 10);
-    self:addLabel(getText("IGUI_PlayerStats_DisplayName").. " ".. self.localPlayer:getDisplayName(), 90, 30);
-    self:addLabel(getText("UI_characreation_forename").. ": " .. self.localPlayer:getDescriptor():getForename(), 90, 50);
-    self:addLabel(getText("UI_characreation_surname").. ": " .. self.localPlayer:getDescriptor():getSurname(), 90, 70);
-    self:addLabel(getText("IGUI_PlayerStats_Profession").. " ".. ProfessionFactory.getProfession(self.localPlayer:getDescriptor():getProfession()):getName(), 90, 90);
-    -- self:addLabel(getText("IGUI_char_Survived_For").. ": " .. self.localPlayer:getTimeSurvived(), 90, 110);
-    self:addLabel(getText("IGUI_char_Survived_For").. ": " .. self.localPlayer:getTimeSurvived(), 90, 110);
+    -- Safely get player info with nil checks
+    local username = self.localPlayer and self.localPlayer:getUsername() or "Unknown"
+    local displayName = self.localPlayer and self.localPlayer:getDisplayName() or "Unknown"
+    local descriptor = self.localPlayer and self.localPlayer:getDescriptor()
+    local forename = descriptor and descriptor:getForename() or "Unknown"
+    local surname = descriptor and descriptor:getSurname() or "Unknown"
+    
+    -- Safe profession handling (PZ 42.x uses getLabel() not getName())
+    local profession = nil
+    local professionName = getText("IGUI_Unknown")
+    if descriptor and descriptor.getCharacterProfession then
+        local success, result = pcall(function() return descriptor:getCharacterProfession() end)
+        if success then
+            profession = result
+            if profession ~= nil then
+                -- Try CharacterProfessionDefinition lookup (PZ 42.x)
+                if CharacterProfessionDefinition and CharacterProfessionDefinition.getCharacterProfessionDefinition then
+                    local defSuccess, defObj = pcall(function() 
+                        return CharacterProfessionDefinition.getCharacterProfessionDefinition(profession) 
+                    end)
+                    if defSuccess and defObj then
+                        -- PZ 42.x uses getLabel() or getUIName()
+                        if defObj.getLabel then
+                            local labelSuccess, labelResult = pcall(function() return defObj:getLabel() end)
+                            if labelSuccess and labelResult then
+                                professionName = labelResult
+                            end
+                        elseif defObj.getUIName then
+                            local uiSuccess, uiResult = pcall(function() return defObj:getUIName() end)
+                            if uiSuccess and uiResult then
+                                professionName = uiResult
+                            end
+                        end
+                    end
+                end
+                
+                -- Fallback to ProfessionFactory (PZ 41.x)
+                if professionName == getText("IGUI_Unknown") and ProfessionFactory and ProfessionFactory.getProfession then
+                    local profSuccess, profObj = pcall(function() return ProfessionFactory.getProfession(profession) end)
+                    if profSuccess and profObj then
+                        -- Try multiple methods
+                        if profObj.getName then
+                            local nameSuccess, nameResult = pcall(function() return profObj:getName() end)
+                            if nameSuccess and nameResult then
+                                professionName = nameResult
+                            end
+                        elseif profObj.getLabel then
+                            local labelSuccess, labelResult = pcall(function() return profObj:getLabel() end)
+                            if labelSuccess and labelResult then
+                                professionName = labelResult
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    self:addLabel(getText("IGUI_PlayerStats_Username") .. " ".. username, 90, 10);
+    self:addLabel(getText("IGUI_PlayerStats_DisplayName").. " ".. displayName, 90, 30);
+    self:addLabel(getText("UI_characreation_forename").. ": " .. forename, 90, 50);
+    self:addLabel(getText("UI_characreation_surname").. ": " .. surname, 90, 70);
+    self:addLabel(getText("IGUI_PlayerStats_Profession").. " ".. professionName, 90, 90);
+    
+    -- Safe player stats with nil checks
+    local timeSurvived = self.localPlayer and self.localPlayer:getTimeSurvived() or "0"
+    local zombieKills = self.localPlayer and self.localPlayer:getZombieKills() or 0
+    local chatMuted = getText("Sandbox_ThumpNoChasing_option1")
+    if self.localPlayer and not self.localPlayer:isAllChatMuted() then
+        chatMuted = getText("Sandbox_ThumpNoChasing_option2")
+    end
+    local accessLevel = self.localPlayer and self.localPlayer:getAccessLevel() or "None"
+    local nutrition = self.localPlayer and self.localPlayer:getNutrition()
+    local weight = nutrition and tostring(math.floor(nutrition:getWeight())) or "0"
+    local calories = nutrition and tostring(math.floor(nutrition:getCalories())) or "0"
+    
+    self:addLabel(getText("IGUI_char_Survived_For").. ": " .. timeSurvived, 90, 110);
     local editTimeBtn = ISButton:new(250, 110, 60, 18, getTranslate("UI_PlayerEditor_EditStats"), self, self.onEditTimeButton)
     editTimeBtn:initialise()
     editTimeBtn:instantiate()
     self:addChild(editTimeBtn)
-    -- self:addLabel(getText("IGUI_char_Zombies_Killed").. ": " .. tostring(self.localPlayer:getZombieKills()), 90, 130);
-    self:addLabel(getText("IGUI_char_Zombies_Killed").. ": " .. tostring(self.localPlayer:getZombieKills()), 90, 130);
+    self:addLabel(getText("IGUI_char_Zombies_Killed").. ": " .. tostring(zombieKills), 90, 130);
     local editKillsBtn = ISButton:new(250, 130, 60, 18, getTranslate("UI_PlayerEditor_EditStats"), self, self.onEditKillsButton)
     editKillsBtn:initialise()
     editKillsBtn:instantiate()
     self:addChild(editKillsBtn)
 
-    local chatMuted = getText("Sandbox_ThumpNoChasing_option1");
-    if not self.localPlayer:isAllChatMuted() then
-        chatMuted = getText("Sandbox_ThumpNoChasing_option2")
-    end
-
-    self:addLabel(getText("IGUI_PlayerStats_AccessLevel") .. " ".. self.localPlayer:getAccessLevel(), 300, 10);
+    self:addLabel(getText("IGUI_PlayerStats_AccessLevel") .. " ".. accessLevel, 300, 10);
     self:addLabel(getText("IGUI_PlayerStats_ChatMuted").. " ".. chatMuted, 300, 30);
-    self:addLabel(getText("IGUI_char_Weight").. ": ".. tostring(math.floor(self.localPlayer:getNutrition():getWeight())), 300, 50);
-    self:addLabel(getTranslate("UI_PlayerEditor_PlayerInfo_Calories").. ": ".. tostring(math.floor(self.localPlayer:getNutrition():getCalories())), 300, 70);
+    self:addLabel(getText("IGUI_char_Weight").. ": ".. weight, 300, 50);
+    self:addLabel(getTranslate("UI_PlayerEditor_PlayerInfo_Calories").. ": ".. calories, 300, 70);
 
     self:addLabel(getTranslate("UI_PlayerEditor_PlayerTraits_Title"), 10, self.avatarPanel.x + self.avatarPanel.height + 5, UIFont.Medium )
 
     self.traitsPanel = UITraitsTable:new(10, 195, self.width - 10 * 2, 180);
     self.traitsPanel:initialise();
     self.traitsPanel.parent = self;
+    self.traitsPanel.localPlayer = self.localPlayer;
     self:addChild(self.traitsPanel);
 
     self:addLabel(getTranslate("UI_PlayerEditor_PlayerSkills_Title"), 10, self.avatarPanel.x + self.avatarPanel.height + self.traitsPanel.height, UIFont.Medium )
@@ -115,6 +180,7 @@ function EtherPlayerEditor:createChildren()
     self.skillPanel = UISkillTable:new(10, self.traitsPanel.x + self.traitsPanel.height + 180, self.width - 10 * 2, 180);
     self.skillPanel:initialise();
     self.skillPanel.parent = self;
+    self.skillPanel.localPlayer = self.localPlayer;
     self:addChild(self.skillPanel);
 end
 

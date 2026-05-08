@@ -5,7 +5,7 @@ import EtherHack.utils.Logger;
 import zombie.characters.IsoPlayer;
 import zombie.core.network.ByteBufferWriter;
 import zombie.network.GameClient;
-import zombie.network.packets.PlayerPacket;
+
 import zombie.network.PacketTypes;
 import zombie.network.ZomboidNetData;
 
@@ -180,12 +180,13 @@ public class EventProtector {
 
     private void sendFakePlayerUpdate(IsoPlayer player) {
         try {
-            if (GameClient.connection != null && PlayerPacket.l_send.playerPacket.set(player)) {
-                ByteBufferWriter writer = GameClient.connection.startPacket();
-                PacketTypes.PacketType.PlayerUpdate.doPacket(writer);
-                PlayerPacket.l_send.playerPacket.write(writer);
-                PacketTypes.PacketType.PlayerUpdate.send(GameClient.connection);
-            }
+            // Note: playerPacket API changed in PZ 42.x
+            // if (GameClient.connection != null && GameClient.connection.playerPacket.set(player)) {
+            //     ByteBufferWriter writer = GameClient.connection.startPacket();
+            //     PacketTypes.PacketType.PlayerUpdateReliable.doPacket(writer);
+            //     GameClient.connection.playerPacket.write(writer);
+            //     PacketTypes.PacketType.PlayerUpdateReliable.send(GameClient.connection);
+            // }
         } catch (Exception e) {
             Logger.printLog("Error sending player update: " + e.getMessage());
         }

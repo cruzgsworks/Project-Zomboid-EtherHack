@@ -1,0 +1,57 @@
+import java.util.Properties
+
+plugins {
+    id 'java'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.release = 25
+}
+
+def loadProperties() {
+    def props = new Properties()
+    file("src/main/resources/EtherHack/EtherHack.properties").withInputStream { props.load(it) }
+    return props
+}
+
+def props = loadProperties()
+group = 'EtherHack'
+version = props.getProperty("version").replace("'", "")
+
+repositories {
+    mavenCentral()
+}
+
+def pzPath = 'C:/Program Files (x86)/Steam/steamapps/common/ProjectZomboid'
+
+dependencies {
+    implementation('org.projectlombok:lombok:1.18.46')
+    annotationProcessor('org.projectlombok:lombok:1.18.46')
+    implementation('org.ow2.asm:asm:9.9.1')
+    implementation('org.ow2.asm:asm-tree:9.9.1')
+    implementation('org.ow2.asm:asm-commons:9.9.1')
+    compileOnly(files("${pzPath}/projectzomboid.jar"))
+}
+
+tasks.named('jar', Jar) {
+    destinationDirectory = project.file('build')
+    archiveFileName = "EtherHack-${version}.jar"
+
+    manifest {
+        attributes('Main-Class': 'EtherHack.Main')
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.runtimeClasspath.collect { file ->
+            file.isDirectory() ? file : zipTree(file)
+        }
+    }
+}

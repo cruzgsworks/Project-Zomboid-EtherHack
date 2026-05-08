@@ -90,6 +90,7 @@ public class EtherAPI {
    public boolean isDisableWetness;
    public boolean isDisableInfectionLevel;
    public boolean isDisableFakeInfectionLevel;
+   public boolean isDisableHasACold;
    public boolean isOptimalCalories;
    public boolean isOptimalWeight;
    public boolean isVisualsEnable;
@@ -510,17 +511,16 @@ public class EtherAPI {
                   var5 = (HandWeapon)var4;
                } while(!var4.getStringItemType().equals("RangedWeapon") && !var4.getStringItemType().equals("MeleeWeapon"));
 
-               String var6 = var5.getFullType();
-               if (this.originalWeaponStats.containsKey(var6)) {
-                  float[] var7 = (float[])this.originalWeaponStats.get(var6);
-                  var5.setExtraDamage(var7[0]);
-                  var5.setMaxDamage(var7[1]);
-                  var5.setMinDamage(var7[2]);
-                  var5.setMaxRange(var7[3]);
-                  var5.setMinRange(var7[4]);
-                  var5.setHitChance((int)var7[5]);
-                  var5.setCritDmgMultiplier(var7[6]);
-               }
+                String var6 = var5.getFullType();
+                if (this.originalWeaponStats.containsKey(var6)) {
+                   float[] var7 = (float[])this.originalWeaponStats.get(var6);
+                   var5.setExtraDamage(var7[0]);
+                   var5.setMaxDamage(var7[1]);
+                   var5.setMinDamage(var7[2]);
+                   var5.setMaxRange(var7[3]);
+                   var5.setMinRange(var7[4]);
+                   var5.setHitChance((int)var7[5]);
+                }
             }
          }
       }
@@ -533,18 +533,17 @@ public class EtherAPI {
          HandWeapon var3;
          if (this.isExtraDamage && var2 != null && (var2.getStringItemType().equals("RangedWeapon") || var2.getStringItemType().equals("MeleeWeapon")) && var2 instanceof HandWeapon) {
             var3 = (HandWeapon)var2;
-            String var4 = var3.getFullType();
-            if (!this.originalWeaponStats.containsKey(var4)) {
-               this.originalWeaponStats.put(var4, new float[]{var3.getExtraDamage(), var3.getMaxDamage(), var3.getMinDamage(), var3.getMaxRange(), var3.getMinRange(), (float)var3.getHitChance(), var3.getCritDmgMultiplier()});
-            }
+             String var4 = var3.getFullType();
+             if (!this.originalWeaponStats.containsKey(var4)) {
+                this.originalWeaponStats.put(var4, new float[]{var3.getExtraDamage(), var3.getMaxDamage(), var3.getMinDamage(), var3.getMaxRange(), var3.getMinRange(), (float)var3.getHitChance()});
+             }
 
-            var3.setExtraDamage(100000.0F);
-            var3.setMaxDamage(1000000.0F);
-            var3.setMinDamage(1000000.0F);
-            var3.setMaxRange(10000.0F);
-            var3.setMinRange(0.0F);
-            var3.setHitChance(100);
-            var3.setCritDmgMultiplier(100000.0F);
+             var3.setExtraDamage(100000.0F);
+             var3.setMaxDamage(1000000.0F);
+             var3.setMinDamage(1000000.0F);
+             var3.setMaxRange(10000.0F);
+             var3.setMinRange(0.0F);
+             var3.setHitChance(100);
          }
 
          if ((Boolean)SandboxOptions.instance.getOptionByName("MultiHitZombies").asConfigOption().getValueAsObject() != this.isMultiHitZombies) {
@@ -631,81 +630,85 @@ public class EtherAPI {
             }
          }
 
-         if (this.isUnlimitedEndurance) {
-            var1.getStats().setEndurance(1.0F);
-         }
+          // Note: Stats and BodyDamage setters removed - API changed in PZ 42.x
+          // These features are temporarily disabled
+          /*
+          if (this.isUnlimitedEndurance) {
+             var1.getStats().setEndurance(1.0F);
+          }
 
-         if (this.isDisableFatigue) {
-            var1.getStats().setFatigue(0.0F);
-         }
+          if (this.isDisableFatigue) {
+             var1.getStats().setFatigue(0.0F);
+          }
 
-         if (this.isDisableHunger) {
-            var1.getStats().setHunger(0.0F);
-         }
+          if (this.isDisableHunger) {
+             var1.getStats().setHunger(0.0F);
+          }
 
-         if (this.isDisableThirst) {
-            var1.getStats().setThirst(0.0F);
-         }
+          if (this.isDisableThirst) {
+             var1.getStats().setThirst(0.0F);
+          }
 
-         if (this.isDisableDrunkenness) {
-            var1.getStats().setDrunkenness(0.0F);
-         }
+          if (this.isDisableDrunkenness) {
+             var1.getStats().setDrunkenness(0.0F);
+          }
 
-         if (this.isDisableAnger) {
-            var1.getStats().setAnger(0.0F);
-         }
+          if (this.isDisableAnger) {
+             var1.getStats().setAnger(0.0F);
+          }
 
-         if (this.isDisableFear) {
-            var1.getStats().setFear(0.0F);
-         }
+          if (this.isDisableFear) {
+             var1.getStats().setFear(0.0F);
+          }
 
-         if (this.isDisablePain) {
-            var1.getStats().setPain(0.0F);
-         }
+          if (this.isDisablePain) {
+             var1.getStats().setPain(0.0F);
+          }
 
-         if (this.isDisablePanic) {
-            var1.getStats().setPanic(0.0F);
-         }
+          if (this.isDisablePanic) {
+             var1.getStats().setPanic(0.0F);
+          }
 
-         if (this.isDisableMorale) {
-            var1.getStats().setMorale(1.0F);
-         }
+          if (this.isDisableMorale) {
+             var1.getStats().setMorale(1.0F);
+          }
 
-         if (this.isDisableStress) {
-            var1.getStats().setStress(0.0F);
-         }
+          if (this.isDisableStress) {
+             var1.getStats().setStress(0.0F);
+          }
 
-         if (this.isDisableSickness) {
-            var1.getStats().setSickness(0.0F);
-         }
+          if (this.isDisableSickness) {
+             var1.getStats().setSickness(0.0F);
+          }
 
-         if (this.isDisableStressFromCigarettes) {
-            var1.getStats().setStressFromCigarettes(0.0F);
-         }
+          if (this.isDisableStressFromCigarettes) {
+             var1.getStats().setStressFromCigarettes(0.0F);
+          }
 
-         if (this.isDisableSanity) {
-            var1.getStats().setSanity(1.0F);
-         }
+          if (this.isDisableSanity) {
+             var1.getStats().setSanity(1.0F);
+          }
 
-         if (this.isDisableBoredomLevel) {
-            var1.getBodyDamage().setBoredomLevel(0.0F);
-         }
+          if (this.isDisableBoredomLevel) {
+             var1.getBodyDamage().setBoredomLevel(0.0F);
+          }
 
-         if (this.isDisableUnhappynessLevel) {
-            var1.getBodyDamage().setUnhappynessLevel(0.0F);
-         }
+          if (this.isDisableUnhappynessLevel) {
+             var1.getBodyDamage().setUnhappynessLevel(0.0F);
+          }
 
-         if (this.isDisableWetness) {
-            var1.getBodyDamage().setWetness(0.0F);
-         }
+          if (this.isDisableWetness) {
+             var1.getBodyDamage().setWetness(0.0F);
+          }
 
-         if (this.isDisableInfectionLevel) {
-            var1.getBodyDamage().setInfectionLevel(0.0F);
-         }
+          if (this.isDisableInfectionLevel) {
+             var1.getBodyDamage().setInfectionLevel(0.0F);
+          }
 
-         if (this.isDisableFakeInfectionLevel) {
-            var1.getBodyDamage().setFakeInfectionLevel(0.0F);
-         }
+          if (this.isDisableFakeInfectionLevel) {
+             var1.getBodyDamage().setFakeInfectionLevel(0.0F);
+          }
+          */
 
          if (this.isOptimalCalories) {
             var1.getNutrition().setCalories(1200.0F);
@@ -719,11 +722,11 @@ public class EtherAPI {
    }
 
    private void bypassDebugMode() {
-      boolean var1 = GameClient.bIngame;
-      boolean var2 = ServerOptions.instance.getBoolean("AntiCheatProtectionType12");
-      boolean var3 = GameServer.bServer;
-      boolean var4 = GameServer.bCoop;
-      Core.bDebug = var1 && this.isBypassDebugMode && (!var2 && var3 || var4 || !var3);
+      // PZ 42.x updated field names
+      boolean var1 = GameClient.ingame;
+      boolean var3 = GameServer.server;
+      boolean var4 = GameServer.coop;
+      Core.debug = var1 && this.isBypassDebugMode && (var3 || var4 || !var3);
    }
 
    @SubscribeLuaEvent(
@@ -742,12 +745,12 @@ public class EtherAPI {
 
    public void updateUltraPlayerVision() {
       if (this.isVisualEnable360Vision) {
-         ArrayList var1 = IsoWorld.instance.getCell().getVehicles();
+         java.util.Set<BaseVehicle> var1 = IsoWorld.instance.getCell().getVehicles();
          if (var1 != null && !var1.isEmpty()) {
-            Iterator var2 = var1.iterator();
+            Iterator<BaseVehicle> var2 = var1.iterator();
 
             while(var2.hasNext()) {
-               BaseVehicle var3 = (BaseVehicle)var2.next();
+               BaseVehicle var3 = var2.next();
                var3.setAlpha(100.0F);
             }
          }
@@ -781,7 +784,7 @@ public class EtherAPI {
       if (this.isVisualsEnable && this.isVisualsVehiclesEnable) {
          IsoPlayer var1 = IsoPlayer.getInstance();
          if (var1 != null) {
-            ArrayList var2 = IsoWorld.instance.getCell().getVehicles();
+            java.util.Set<BaseVehicle> var2 = IsoWorld.instance.getCell().getVehicles();
             float var3 = PlayerUtils.getScreenPositionX(var1);
             float var4 = PlayerUtils.getScreenPositionY(var1);
             float var5 = this.vehiclesUIColor.a;

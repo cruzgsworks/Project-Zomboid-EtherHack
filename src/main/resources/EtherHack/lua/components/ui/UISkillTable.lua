@@ -52,7 +52,11 @@ function UISkillTable:createChildren()
         local selectedItem = self.datas.items[self.datas.selected].item
         self.localPlayer:LevelPerk(selectedItem.perk);
         self.localPlayer:getXp():setXPToLevel(selectedItem.perk, self.localPlayer:getPerkLevel(selectedItem.perk));
-        SyncXp(self.localPlayer)
+        -- PZ 42.x: SyncXp requires admin capability, server drops it for non-admins
+        -- LevelPerk auto-syncs Str/Fit via sendPerks(); other perks are local-only in MP
+        if not isClient() then
+            SyncXp(self.localPlayer)
+        end
         self:updateSkills();
         if selectedItem.perk == Perks.Strength or selectedItem.perk == Perks.Fitness then
             self.parent.traitsPanel:updateTraits();
@@ -74,7 +78,10 @@ function UISkillTable:createChildren()
         local selectedItem = self.datas.items[self.datas.selected].item
         self.localPlayer:LoseLevel(selectedItem.perk);
         self.localPlayer:getXp():setXPToLevel(selectedItem.perk, self.localPlayer:getPerkLevel(selectedItem.perk));
-        SyncXp(self.localPlayer)
+        -- PZ 42.x: SyncXp requires admin capability, server drops it for non-admins
+        if not isClient() then
+            SyncXp(self.localPlayer)
+        end
         self:updateSkills();
         if selectedItem.perk == Perks.Strength or selectedItem.perk == Perks.Fitness then
             self.parent.traitsPanel:updateTraits();
@@ -99,9 +106,13 @@ function UISkillTable:createChildren()
                 for i=1, 10 do
                     self.localPlayer:LevelPerk(perk, false);
                     self.localPlayer:getXp():setXPToLevel(perk, self.localPlayer:getPerkLevel(perk));
-                    SyncXp(self.localPlayer)
                 end
             end
+        end
+        -- PZ 42.x: SyncXp requires admin capability, server drops it for non-admins
+        -- LevelPerk auto-syncs Str/Fit via sendPerks(); other perks are local-only in MP
+        if not isClient() then
+            SyncXp(self.localPlayer)
         end
         self.parent.traitsPanel:updateTraits();
         self:updateSkills();

@@ -22,9 +22,10 @@ import zombie.inventory.InventoryItem;
 import zombie.network.GameClient;
 import zombie.network.PacketTypes;
 import zombie.network.ServerOptions;
-import zombie.network.packets.PlayerPacket;
 import zombie.scripting.ScriptManager;
 import zombie.scripting.objects.Recipe;
+import EtherHack.utils.StatsModifier;
+import zombie.characters.IsoPlayer;
 
 public class EtherLuaMethods {
    private static EtherLuaMethods instance = null;
@@ -161,10 +162,10 @@ public class EtherLuaMethods {
          EtherMain.getInstance().etherAPI.isPlayerInSafeTeleported = true;
          IsoPlayer player = IsoPlayer.getInstance();
 
-         float z = player.z;
-         float dx = x - player.x;
-         float dy = y - player.y;
-         float dz = z - player.z;
+         float z = player.getZ();
+         float dx = x - player.getX();
+         float dy = y - player.getY();
+         float dz = z - player.getZ();
 
          float absDx = Math.abs(dx);
          float absDy = Math.abs(dy);
@@ -184,22 +185,24 @@ public class EtherLuaMethods {
             if (dy < 0) stepY = -stepY;
             if (dz < 0) stepZ = -stepZ;
 
-            player.setX(player.x + stepX);
-            player.setY(player.y + stepY);
-            player.setZ(player.z + stepZ);
-            player.setLx(player.getX());
-            player.setLy(player.getY());
-            player.setLz(player.getZ());
+            player.setX(player.getX() + stepX);
+            player.setY(player.getY() + stepY);
+            player.setZ(player.getZ() + stepZ);
+            // Note: setLx/Ly/Lz methods removed in PZ 42.x
+            // player.setLx(player.getX());
+            // player.setLy(player.getY());
+            // player.setLz(player.getZ());
 
             GameClient.instance.sendPlayer(player);
 
-            if (GameClient.connection != null &&
-                    PlayerPacket.l_send.playerPacket.set(player)) {
-               ByteBufferWriter writer = GameClient.connection.startPacket();
-               PacketTypes.PacketType.PlayerUpdateReliable.doPacket(writer);
-               PlayerPacket.l_send.playerPacket.write(writer);
-               PacketTypes.PacketType.PlayerUpdateReliable.send(GameClient.connection);
-            }
+            // Note: playerPacket API changed in PZ 42.x
+            // if (GameClient.connection != null &&
+            //         GameClient.connection.playerPacket.set(player)) {
+            //    ByteBufferWriter writer = GameClient.connection.startPacket();
+            //    PacketTypes.PacketType.PlayerUpdateReliable.doPacket(writer);
+            //    GameClient.connection.playerPacket.write(writer);
+            //    PacketTypes.PacketType.PlayerUpdateReliable.send(GameClient.connection);
+            // }
          }
 
          EtherMain.getInstance().etherAPI.isPlayerInSafeTeleported = false;
@@ -766,6 +769,10 @@ public class EtherLuaMethods {
    )
    public static void toggleUnlimitedEndurance(boolean var0) {
       EtherMain.getInstance().etherAPI.isUnlimitedEndurance = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -798,6 +805,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableFatigue(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableFatigue = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -814,6 +825,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableHunger(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableHunger = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -830,6 +845,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableThirst(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableThirst = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -846,6 +865,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableDrunkenness(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableDrunkenness = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -862,6 +885,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableAnger(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableAnger = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -878,6 +905,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableFear(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableFear = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -894,6 +925,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisablePain(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisablePain = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -910,6 +945,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisablePanic(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisablePanic = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -926,6 +965,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableMorale(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableMorale = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -942,6 +985,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableStress(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableStress = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -958,6 +1005,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableSickness(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableSickness = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -974,6 +1025,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableStressFromCigarettes(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableStressFromCigarettes = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -990,6 +1045,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableSanity(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableSanity = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -1006,6 +1065,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableBoredomLevel(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableBoredomLevel = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -1022,6 +1085,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableUnhappynessLevel(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableUnhappynessLevel = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(
@@ -1035,6 +1102,10 @@ public class EtherLuaMethods {
    @LuaMethod(name = "toggleDisableWetness", global = true)
    public static void toggleDisableWetness(boolean value) {
       EtherMain.getInstance().etherAPI.isDisableWetness = value;
+      if (value) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(name = "isDisableWetness", global = true)
@@ -1045,6 +1116,10 @@ public class EtherLuaMethods {
    @LuaMethod(name = "toggleDisableInfectionLevel", global = true)
    public static void toggleDisableInfectionLevel(boolean value) {
       EtherMain.getInstance().etherAPI.isDisableInfectionLevel = value;
+      if (value) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(name = "isDisableInfectionLevel", global = true)
@@ -1058,6 +1133,10 @@ public class EtherLuaMethods {
    )
    public static void toggleDisableFakeInfectionLevel(boolean var0) {
       EtherMain.getInstance().etherAPI.isDisableFakeInfectionLevel = var0;
+      if (var0) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(name = "isDisableFakeInfectionLevel", global = true)
@@ -1065,9 +1144,27 @@ public class EtherLuaMethods {
       return EtherMain.getInstance().etherAPI.isDisableFakeInfectionLevel;
    }
 
+   @LuaMethod(name = "toggleDisableHasACold", global = true)
+   public static void toggleDisableHasACold(boolean value) {
+      EtherMain.getInstance().etherAPI.isDisableHasACold = value;
+      if (value) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
+   }
+
+   @LuaMethod(name = "isDisableHasACold", global = true)
+   public static boolean isDisableHasACold() {
+      return EtherMain.getInstance().etherAPI.isDisableHasACold;
+   }
+
    @LuaMethod(name = "toggleOptimalCalories", global = true)
    public static void toggleOptimalCalories(boolean value) {
       EtherMain.getInstance().etherAPI.isOptimalCalories = value;
+      if (value) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(name = "isOptimalCalories", global = true)
@@ -1078,6 +1175,10 @@ public class EtherLuaMethods {
    @LuaMethod(name = "toggleOptimalWeight", global = true)
    public static void toggleOptimalWeight(boolean value) {
       EtherMain.getInstance().etherAPI.isOptimalWeight = value;
+      if (value) {
+         IsoPlayer player = IsoPlayer.getInstance();
+         if (player != null) StatsModifier.getInstance().applyInstantMods(player);
+      }
    }
 
    @LuaMethod(name = "isOptimalWeight", global = true)
@@ -1097,17 +1198,54 @@ public class EtherLuaMethods {
 
    @LuaMethod(name = "getAntiCheat12Status", global = true)
    public static boolean getAntiCheat12Status() {
-      String verificationKey = SafeAPI.getInstance().generateVerificationKey();
-      methodCache.put(verificationKey, ServerOptions.instance.getBoolean("AntiCheatProtectionType12"));
-      return (Boolean) methodCache.remove(verificationKey);
+      try {
+         // PZ 42: Anti-cheat options are now EnumServerOption fields
+         // Check if any anti-cheat category is enabled (value > 0)
+         String[] antiCheatFields = {
+            "antiCheatSafety", "antiCheatMovement", "antiCheatHit",
+            "antiCheatPacket", "antiCheatPermission", "antiCheatXp",
+            "antiCheatFire", "antiCheatSafeHouse", "antiCheatRecipe",
+            "antiCheatPlayer", "antiCheatChecksum", "antiCheatItem",
+            "antiCheatServerCustomization"
+         };
+         for (String fieldName : antiCheatFields) {
+            java.lang.reflect.Field field = ServerOptions.class.getField(fieldName);
+            Object option = field.get(ServerOptions.instance);
+            if (option != null) {
+               java.lang.reflect.Method getValue = option.getClass().getMethod("getValueAsObject");
+               Object value = getValue.invoke(option);
+               if (value instanceof Integer && (Integer) value > 0) {
+                  return true;
+               }
+            }
+         }
+         return false;
+      } catch (Exception e) {
+         return false;
+      }
    }
 
    @LuaMethod(name = "getAntiCheat8Status", global = true)
    public static boolean getAntiCheat8Status() {
-      // Add method verification
-      String verificationKey = SafeAPI.getInstance().generateVerificationKey();
-      methodCache.put(verificationKey, ServerOptions.instance.getBoolean("AntiCheatProtectionType8"));
-      return (Boolean) methodCache.remove(verificationKey);
+      try {
+         // PZ 42: Check specific anti-cheat categories that were previously Type 8
+         // Type 8 was typically related to movement/teleport anti-cheat
+         String[] type8Fields = {"antiCheatMovement", "antiCheatPacket"};
+         for (String fieldName : type8Fields) {
+            java.lang.reflect.Field field = ServerOptions.class.getField(fieldName);
+            Object option = field.get(ServerOptions.instance);
+            if (option != null) {
+               java.lang.reflect.Method getValue = option.getClass().getMethod("getValueAsObject");
+               Object value = getValue.invoke(option);
+               if (value instanceof Integer && (Integer) value > 0) {
+                  return true;
+               }
+            }
+         }
+         return false;
+      } catch (Exception e) {
+         return false;
+      }
    }
 
    @LuaMethod(name = "requireExtra", global = true)

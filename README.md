@@ -1,183 +1,273 @@
 <h1 align="center">Project-Zomboid-EtherHack</h1>
-<img src="demo/EtherLogo.png" alt="EtherHack Logo">
 <p align="center">
-  <img src="https://img.shields.io/github/v/release/Yeet-Masta/Project-Zomboid-EtherHack" alt="GitHub release (latest by date)">
-  <img src="https://img.shields.io/github/license/Yeet-Masta/Project-Zomboid-EtherHack" alt="GitHub">
-  <img src="https://img.shields.io/github/commit-activity/t/Yeet-Masta/Project-Zomboid-EtherHack" alt="GitHub commit activity (branch)">
-  <img src="https://img.shields.io/badge/Java-17-green" alt="Java 17">
-  <img src="https://img.shields.io/github/issues/Yeet-Masta/Project-Zomboid-EtherHack" alt="GitHub issues">
+  <img src="demo/EtherLogo.png" alt="EtherHack Logo" width="200">
+</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/Project%20Zomboid-42.17.0%2B-blue" alt="PZ Version">
+  <img src="https://img.shields.io/badge/Java-25-orange" alt="Java 25">
+  <img src="https://img.shields.io/badge/Gradle-9.1.0-green" alt="Gradle">
+  <img src="https://img.shields.io/github/license/cruzgsworks/Project-Zomboid-EtherHack" alt="License">
 </p>
 
-## Upgrade!!!
-I'm currecntly converting all the code to kotlin. I want to do this for several reasons. The code is much cleaner, and personally, I like kotlin better. so if this repo doesn't get updated in a while. you know why :)
+> **⚠️ WARNING:** This is a cheat/modification tool for Project Zomboid. Use at your own risk. Most features have only been tested in single-player mode.
 
-## NOTICE!!!
-There are repo's going around pretending to be EtherHack or just a PZ cheat (https://github.com/ayhantunay/Project-Zomboid-Cheat) and I HIGHLY ADVISE YOU DON"T DOWNLOAD THESE!!! They are asking you to download completely arbitrary DLL files and disable your fucking anti-virus!!! Please for the love of god, don't download this shit. Use your head!!!
+## Overview
 
-This is a cheat written in Java(API) and LUA(GUI) for Project Zomboid. It is aimed at providing the game with additional functionality that allows users to get some benefits. Please use responsibly and understand the consequences that may arise as a result of improper use.
-The performance of the cheat was tested on the latest version of the game `41.78.16 (Steam)` (July 09, 2023).
+EtherHack is a Java/Lua-based modification for Project Zomboid that provides additional gameplay functionality. This fork has been updated for **Project Zomboid Build 42.17.0+** compatibility.
 
-Edit: Finally after all this time! the project has been restored!!! I know the code quality is shit, but lest be honest it's better than nothing. And as a wise man once said "It Just Works" soooooooo. But, if any of you guys want to contribute, PLEASE! my dumb ass can't code that well and I really want this project to live on so any contrabutions would be helpful and apreaciated! Also, FUCK https://github.com/asledgehammer/EtherHammer !!! EAT SHIT!
+### Key Changes from Original
+- **Java 25 Bytecode Support:** Updated patching system for PZ 42's Java 25 runtime
+- **Tree API Patching:** Replaced MethodVisitor approach with ASM Tree API + COMPUTE_FRAMES to preserve StackMapTable
+- **CharacterStat API:** Updated stats system for PZ 42's `Map<CharacterStat, Float>` structure
+- **DebugOptions Panel:** New cheats panel using PZ 42's native `DebugOptions` API
 
-Edit edit: wtf is [this???](https://imgur.com/a/rat1-v5T7l31)
-
-Warning!!! Please check out [this github repo](https://github.com/Yeet-Masta/Project-Zomboid/tree/arkiease)
-
-[Check this out!!!](https://www.unknowncheats.me/forum/other-mmorpg-and-strategy/645408-project-zomboid-cheat-valkur.html) This is freaking dope!!!
-
-You can watch the cheat [installation video](https://www.youtube.com/watch?v=Olx7O3HyeZc) and see its main functions in action.
+---
 
 ## Table of Contents
-- [Cheat functionality](#cheat-functionality)
-- [Demo](#demo)
-- [Getting Started](#getting-started)
+- [Compatibility](#compatibility)
+- [Features](#features)
 - [Prerequisites](#prerequisites)
+- [Building from Source](#building-from-source)
 - [Installation](#installation)
 - [Uninstallation](#uninstallation)
 - [Usage](#usage)
-- [For developer](#for-developer)
-- [Contributing](#contributing)
-- [Disclaimer](#disclaimer)
+- [Known Issues](#known-issues)
+- [Troubleshooting](#troubleshooting)
+- [For Developers](#for-developers)
+- [Credits](#credits)
 - [License](#license)
-- [Contact](#contact)
 
-## Cheat functionality
+---
 
-| Function                   |  Working in multiplayer  | Working in a co-op  | Description                                                                                                                                                                                                                                                     |
-|----------------------------|:------------------------:|:-------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Debug Mode Bypass          |          -/+(*)          |          +          | Allows you to use the developer mode in multiplayer (when starting the game with -debug connection is not possible). When you click the right mouse button, additional menus appear, including changing clothes, repairing cars, teleporting on the map, etc.   |
-| MultiHit Zombie            |            +             |          +          | Enables multi-hit zombie mode                                                                                                                                                                                                                                   |
-| Invisible                  |          -/+(*)          |          +          | Allows you to become invisible to everyone                                                                                                                                                                                                                      |
-| God Mode                   |          -/+(*)          |          +          | Gives immortality to the character                                                                                                                                                                                                                              |
-| No Clip                    |          -/+(*)          |          +          | Ability to pass through walls and objects                                                                                                                                                                                                                       |
-| Unlimited Carry            |            +             |          +          | Enable infinite load capacity, including for third-party containers                                                                                                                                                                                             |
-| Unlimited Endurance        |            +             |          +          | Enable unlimited endurance                                                                                                                                                                                                                                      |
-| Disable Fatigue            |            +             |          +          | Disables the need for sleep                                                                                                                                                                                                                                     |
-| Disable Hunger             |            +             |          +          | Disables the need for food                                                                                                                                                                                                                                      |
-| Disable Thirst             |            +             |          +          | Disables the need for water                                                                                                                                                                                                                                     |
-| Disable Character Needs    |            +             |          +          | Disables all the needs of the character, sets its characteristics to the maximum - positive - level (stress, panic, etc.)                                                                                                                                       |
-| Add x100 Trait Point(beta) |         -/+ (**)         |          +          | Adds +100 points to the character creation menu                                                                                                                                                                                                                 |
-| Game Debugger              |            +             |          +          | Opens the debugging window                                                                                                                                                                                                                                      |
-| Items Creator              |            +             |          +          | The item creation menu, the ability to sort, search, etc.                                                                                                                                                                                                       |
-| Player Editor              |            +             |          +          | The character editing menu, the ability to add skills, perks, etc.                                                                                                                                                                                              |
-| Get Admin Access           |          -/+(*)          |          +          | Obtaining administrator rights on the server                                                                                                                                                                                                                    |
-| Open Admin Menu            |          -/+(*)          |          +          | Opens the admin window                                                                                                                                                                                                                                          |
+## Compatibility
 
-(*) - These functions work in multiplayer, provided that some types of anti-cheats are disabled, otherwise it will kick. As a rule, for servers with mods, some types are disabled, for example, [type 12](https://www.unknowncheats.me/forum/other-mmorpg-and-strategy/522818-project-zomboid-anti-cheat-types.html), but for full operation, [type 8](https://www.unknowncheats.me/forum/other-mmorpg-and-strategy/522818-project-zomboid-anti-cheat-types.html) is required to be disabled
+| Component | Version |
+|-----------|---------|
+| Project Zomboid | **42.17.0+** |
+| Java Runtime | **25** |
+| Gradle | **9.1.0** |
 
-(**) - It only works when creating a character from the main menu, that is, points will not be added to the menu after death. Solution: after death, log out of the server and connect again.
+> **Note:** This version is NOT compatible with PZ 41.x. For PZ 41, use the original [Yeet-Masta/EtherHack](https://github.com/Yeet-Masta/Project-Zomboid-EtherHack).
 
+---
 
-## Demo
-![1](demo/1.jpg)
-![2](demo/2.jpg)
-![3](demo/3.jpg)
-![4](demo/4.jpg)
-![5](demo/5.jpg)
-![6](demo/6.jpg)
-![7](demo/7.jpg)
-![8](demo/8.jpg)
-![9](demo/9.jpg)
+## Features
 
-## Getting Started
+All features work in single-player mode. Multiplayer compatibility is untested and not officially supported.
 
-This section will provide information on how to get a local copy of the project up and running.
+---
 
-### Prerequisites
+## Prerequisites
 
-This tool requires:
+### Required Software
+1. **JDK 25** (for Gradle build and Java 25 bytecode compilation)
+   - [Oracle JDK 25](https://www.oracle.com/java/technologies/downloads/)
+2. **Steam copy of Project Zomboid** (Build 42.17.0+)
 
--   [Java 17]([https://www.oracle.com/java/technologies/downloads/](https://adoptium.net/temurin/releases/?version=17)) or newer
--   Steam copy of [Project Zomboid](https://store.steampowered.com/app/108600/Project_Zomboid/)
+### Environment Variables
+Set `JAVA_HOME` pointing to your JDK 25 installation:
+```powershell
+# Windows PowerShell (temporary)
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25.0.3"
 
-### Installation
-
-1. Download and install Java on your computer
-2. Make sure that the path to Java is set in your environment variables
-
-(For Windows: `WIN + X` -> `"System"` -> `"Advanced System Parameters"` -> `"Environment Variables"` -> `Double click on "Path"` -> `Insert path to java, for example "C:\Program Files\Java\jdk-20\bin"`)
-
-3. Clone the repository
-4. Open the project in the IDE and build the executable via Gradle `.jar` file
-5. Move the created `.jar` to the root folder of the game 
-
-(For example, `c:\Steam\steamapps\common\ProjectZomboid`)
-
-6. Open the console in the root folder and run the following command: 
-
-```
-java -jar ./EtherHack-{yourVersion}.jar --install
+# Windows System (permanent)
+[Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-25.0.3", "Machine")
 ```
 
-`{yourVersion}` - Specify your version of the cheat
+---
 
-For example, for release 1.1, the command will look like this:
-```
-java -jar ./EtherHack-1.1.jar --install
-```
-### Uninstallation
-Open the console in the root folder and run the following command:
-```
-java -jar ./EtherHack-{yourVersion}.jar --uninstall
+## Building from Source
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/cruzgsworks/Project-Zomboid-EtherHack.git
+cd Project-Zomboid-EtherHack
 ```
 
-`{yourVersion}` - Specify your version of the cheat
+### 2. Copy Game Libraries
+Copy these JARs from your Project Zomboid installation directory to `lib/`:
+- `zombie.jar` (copy `projectzomboid.jar` and rename, or use directly)
+- `Kahlua.jar`
+- `fmod.jar`
+- `org.jar`
 
-For example, for release 1.1, the command will look like this:
+> **Note:** These JARs are not included for copyright reasons.
+
+### 3. Build
+```powershell
+# Windows
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25.0.3"
+$env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+
+.\gradlew.bat --no-daemon build
 ```
-java -jar ./EtherHack-1.1.jar --uninstall
+
+```bash
+# Linux/macOS
+export JAVA_HOME=/path/to/jdk-25
+export PATH=$JAVA_HOME/bin:$PATH
+./gradlew --no-daemon build
 ```
+
+### 4. Output
+The built JAR will be at `build/EtherHack-{version}.jar`
+
+---
+
+## Installation
+
+1. **Close Project Zomboid** if it's running
+2. **Copy the JAR** to your Project Zomboid root folder:
+   ```
+   C:\Program Files (x86)\Steam\steamapps\common\ProjectZomboid\
+   ```
+3. **Run the installer**:
+   ```powershell
+   java -jar EtherHack-{version}.jar --install
+   ```
+4. **Start the game**
+
+---
+
+## Uninstallation
+
+```powershell
+# Run from the Project Zomboid directory
+java -jar EtherHack-{version}.jar --uninstall
+```
+
+This will:
+- Restore the original `projectzomboid.jar`
+- Remove all extracted EtherHack files
+
+---
 
 ## Usage
 
-After successfully installing the cheat, you need to log in to the game. When loading, the cheat logo will appear in front of the main logo, in the game itself (menu and in the game session) in the lower left corner there will be information about the cheat. The name of the game window will also change.
+| Key | Function |
+|-----|----------|
+| `Insert` | Open/Close cheat menu |
+| `Home` | Reload Lua GUI (close all windows first) |
 
-To open the cheat menu, press `Insert`
+### Menu Sections
+- **Character:** Edit traits, skills, stats
+- **Items:** Spawn items, repair vehicles
+- **Visuals:** ESP, player highlighting
+- **Exploits:** Teleport, safe teleport
+- **Cheats:** Debug options panel (PZ 42 native cheats)
+- **Settings:** Configure colors, options
 
-To reload the LuaGUI, press `Home`, but first make sure that all the cheat windows are closed, otherwise an error will appear.
+---
 
-## For developer
-If you are a developer and want to expand the functionality, you can do it as follows:
+## Known Issues
 
-In the project folder located on the path `src/main/resources/EtherHack/lua` there is a single file responsible for rendering the entire user interface of the cheat. You can edit it using examples from game files.
+### Technical
+- **Gradle 8.x incompatible:** Gradle 8.14.2's Kotlin compiler doesn't support Java 25. Must use Gradle 9.0+.
+- **MethodVisitor patching:** PZ 42's Java 25 bytecode requires StackMapTable preservation. Tree API + COMPUTE_FRAMES is required.
 
-Also, Eterhack provides the ability to add custom methods from Java to lua, for this in the `src/main/java/EtherHack/Ether/EtherAPI.java` needs to find the `public static class GlobalEtherAPI` and add it according to the available examples:
+---
+
+## Troubleshooting
+
+### Build fails with "25.0.3"
+**Cause:** Gradle's Kotlin compiler can't parse Java 25 version string.
+**Fix:** Use Gradle 9.0 Milestone 2 or newer.
+
+### `UnsupportedClassVersionError` during install
+**Cause:** Running installer with wrong Java version.
+**Fix:** Ensure `JAVA_HOME` points to JDK 25:
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25.0.3"
+& "$env:JAVA_HOME\bin\java.exe" -jar EtherHack.jar --install
+```
+
+### Game crashes on startup after install
+**Cause:** Corrupted `projectzomboid.jar` or leftover files from previous install.
+**Fix:**
+1. Run `--uninstall`
+2. Verify game files via Steam
+3. Reinstall
+
+### Menu doesn't open
+**Cause:** Lua files not extracted properly.
+**Fix:** Check `ProjectZomboid/EtherHack/lua/` exists. Reinstall if missing.
+
+---
+
+## For Developers
+
+### Adding Custom Lua Methods
+
+In `src/main/java/EtherHack/Ether/EtherAPI.java`, add to `GlobalEtherAPI`:
 
 ```java
-@LuaMethod(
-         name = "yourMethodName",
-        global = true
-)
+@LuaMethod(name = "yourMethodName", global = true)
 public static String yourMethodName() {
     return "Test!";
 }
 ```
-After adding and reassembling the cheat, you will be able to call this method in lua:
 
+Call from Lua:
 ```lua
-print(yourMethodName());
---Output log: Test!
+print(yourMethodName())
+-- Output: Test!
 ```
-In addition, you can load third-party Lua in any other Lua through the `EtherRequire` method:
 
+### Loading External Lua
 ```lua
 EtherRequire "path/to/your.lua"
 ```
+Path is relative to the game root folder.
 
-The path to Lua must be specified relative to the root folder of the game
-## Contributing
+### Project Structure
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── EtherHack/
+│   │       ├── Ether/
+│   │       │   ├── EtherAPI.java          # Lua API bridge
+│   │       │   ├── EtherLuaMethods.java   # Lua method implementations
+│   │       │   ├── StatsModifier.java     # CharacterStat handling
+│   │       │   └── ...
+│   │       ├── utils/
+│   │       │   ├── Patch.java             # Bytecode patching (Tree API)
+│   │       │   └── ...
+│   │       └── Main.java                  # Entry point
+│   └── resources/
+│       └── EtherHack/
+│           └── lua/                       # GUI components
+```
 
-We welcome contributions from the community. If you want to contribute, please fork the repository and create a pull request with your changes.
+---
 
-## Disclaimer
+## Credits
 
-This software is provided 'as-is', without any express or implied warranty. In no event will the author be held liable for any damages arising from the use of this software. Use of this software may also violate the terms of service of the game and could lead to your account being banned. Use at your own risk.
+- **Updater:** cruzgsworks and drkm43
+- **Original Author:** Yeet-Masta
+- **Contributors:** Community contributors via GitHub
+
+Special thanks to:
+- The Project Zomboid modding community
+- [Zomboid Decompiler](https://github.com/asledgehammer/ZomboidDecompiler) for codebase analysis
+- [demiurgequantified](https://demiurgequantified.github.io/ProjectZomboidJavaDocs/) for PZ JavaDocs
+
+---
 
 ## License
 
-This project is under `MIT License` - see the LICENSE file for details.
+This project is under `MIT License` - see the [LICENSE](LICENSE) file for details.
 
-## Contact
+---
 
-If you have any questions, feel free to reach out to me at `spaceguy234@gmail.com`
-Also here's the unofficial official [discord](https://discord.gg/4CMAVqEey2) server
+## Disclaimer
+
+This software is provided 'as-is', without any express or implied warranty. In no event will the author be held liable for any damages arising from the use of this software. Use of this software may violate the terms of service of the game and could lead to your account being banned. Use at your own risk.
+
+**Use responsibly and understand the consequences that may arise as a result of improper use.**
+
+---
+
+<p align="center">
+  <sub>Built with ❤️ for the Project Zomboid community</sub>
+</p>

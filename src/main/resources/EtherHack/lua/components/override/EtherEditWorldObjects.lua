@@ -54,18 +54,18 @@ function EtherEditWorldObjects.doDebugObjectMenu(player, context, worldobjects, 
 			subMenu:addOption(getTranslate("UI_DebugObject_FireplaceSetFuel"), obj, EtherEditWorldObjects.OnFireplaceSetFuel)
 		end
 		
-		if CCampfireSystem.instance:isValidIsoObject(obj) then
+		if CCampfireSystem and CCampfireSystem.instance and CCampfireSystem.instance:isValidIsoObject(obj) then
 			subMenu:addOption(getTranslate("UI_DebugObject_CampfireZeroFuel"), obj, EtherEditWorldObjects.OnCampfireZeroFuel)
 			subMenu:addOption(getTranslate("UI_DebugObject_CampfireSetFuel"), obj, EtherEditWorldObjects.OnCampfireSetFuel)
 		end
-		if not metalDrum and CMetalDrumSystem:isValidIsoObject(obj) then
+		if not metalDrum and CMetalDrumSystem and CMetalDrumSystem.instance and CMetalDrumSystem.instance:isValidIsoObject(obj) then
 			if obj:hasModData() and not obj:getModData().haveLogs and not obj:getModData().haveCharcoal then
 				subMenu:addOption(getTranslate("UI_DebugObject_MDrumZeroFuel"), obj, EtherEditWorldObjects.OnMetalDrumZeroWater)
 				subMenu:addOption(getTranslate("UI_DebugObject_MDrumSetFuel"), obj, EtherEditWorldObjects.OnMetalDrumSetWater)
 			end
 			metalDrum = obj
 		end
-		if not rainBarrel and CRainBarrelSystem:isValidIsoObject(obj) then
+		if not rainBarrel and CRainBarrelSystem and CRainBarrelSystem.instance and CRainBarrelSystem.instance:isValidIsoObject(obj) then
 			subMenu:addOption(getTranslate("UI_DebugObject_RBarrelZeroFuel"), obj, EtherEditWorldObjects.OnRainBarrelZeroWater)
 			subMenu:addOption(getTranslate("UI_DebugObject_RBarrelSetFuel"), obj, EtherEditWorldObjects.OnRainBarrelSetWater)
 			rainBarrel = obj

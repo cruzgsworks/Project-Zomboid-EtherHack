@@ -50,7 +50,11 @@ function UIModalAddXP:createChildren()
         if amount and amount ~= "" then
             amount = tonumber(amount);
             getPlayer():getXp():AddXP(skill:getType(), amount, false, false, true);
-            sendAddXp(getPlayer(), skill:getType(), amount);
+            -- PZ 42.x: sendAddXp requires Capability.AddXP (admin only)
+            -- AddXP works locally; sync only works in single-player or with admin
+            if not isClient() then
+                sendAddXp(getPlayer(), skill:getType(), amount);
+            end
             UISkillTable.instance:updateSkills();
         end
     end)
