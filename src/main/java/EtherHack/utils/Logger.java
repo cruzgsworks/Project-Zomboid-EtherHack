@@ -8,7 +8,8 @@ public class Logger {
    }
 
    public static void printLog(String var0) {
-      DebugLog.General.print("[EtherHack]: " + var0);
+      // Note: DebugLog.General API changed in PZ 42.x
+      System.out.println("[EtherHack]: " + var0);
    }
 
    public static void printCredits() {

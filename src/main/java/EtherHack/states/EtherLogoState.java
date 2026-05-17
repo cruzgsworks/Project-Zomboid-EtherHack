@@ -17,35 +17,34 @@ public class EtherLogoState extends GameState {
    private int stage = 0;
    private float targetAlpha = 0.0F;
    private boolean noRender = false;
-   private final LogoElement etherLogo = new LogoElement("EtherHack/media/EtherLogo.png");
+   private final LogoElement etherLogo = new LogoElement("EtherHack/media/freeEtherLogo.png");
 
    public void enter() {
-      UIManager.bSuspend = true;
+      // Note: UIManager.bSuspend API changed in PZ 42.x
+      // UIManager.bSuspend = true;
       this.alpha = 0.0F;
       this.targetAlpha = 1.0F;
    }
 
    public void exit() {
-      UIManager.bSuspend = false;
+      // Note: UIManager.bSuspend API changed in PZ 42.x
+      // UIManager.bSuspend = false;
    }
 
    public void render() {
       Core var1 = Core.getInstance();
       if (this.noRender) {
-         var1.StartFrameUI();
+         var1.StartFrame();
          SpriteRenderer.instance.renderi((Texture)null, 0, 0, var1.getOffscreenWidth(0), var1.getOffscreenHeight(0), 0.0F, 0.0F, 0.0F, 1.0F, (Consumer)null);
          var1.EndFrame();
       } else {
-         var1.StartFrameUI();
+         var1.StartFrame();
          var1.EndFrame();
-         boolean var2 = UIManager.useUIFBO;
-         UIManager.useUIFBO = false;
          var1.StartFrameUI();
          SpriteRenderer.instance.renderi((Texture)null, 0, 0, var1.getOffscreenWidth(0), var1.getOffscreenHeight(0), 0.0F, 0.0F, 0.0F, 1.0F, (Consumer)null);
          this.etherLogo.centerOnScreen();
          this.etherLogo.render(this.alpha);
          var1.EndFrameUI();
-         UIManager.useUIFBO = var2;
       }
 
    }

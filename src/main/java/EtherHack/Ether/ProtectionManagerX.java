@@ -312,11 +312,19 @@ public class ProtectionManagerX {
             }
 
             // Send the packet
-            PacketTypes.PacketType.PlayerUpdate.send(GameClient.connection);
+            PacketTypes.PacketType.PlayerUpdateReliable.send(GameClient.connection);
 
         } catch (Exception e) {
             Logger.printLog("Error sending packet: " + e.getMessage());
         }
+    }
+
+    // Helper method to read string from buffer
+    private String readStringFromBuffer(ByteBuffer buffer) {
+        int length = buffer.getInt();
+        byte[] bytes = new byte[length];
+        buffer.get(bytes);
+        return new String(bytes);
     }
 
     // Helper method to read data from incoming packets
@@ -325,13 +333,13 @@ public class ProtectionManagerX {
         try {
             int entries = buffer.getInt();
             for (int i = 0; i < entries; i++) {
-                String key = GameWindow.ReadStringUTF(buffer);
+                String key = readStringFromBuffer(buffer);
                 byte type = buffer.get();
 
                 Object value;
                 switch (type) {
                     case 0: // String
-                        value = GameWindow.ReadStringUTF(buffer);
+                        value = readStringFromBuffer(buffer);
                         break;
                     case 1: // Long
                         value = buffer.getLong();

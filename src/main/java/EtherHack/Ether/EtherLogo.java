@@ -14,6 +14,9 @@ public class EtherLogo {
    }
 
    public void init() {
+      // Note: GameState API changed in PZ 42.x
+      // Logo initialization temporarily disabled
+      /*
       ArrayList var1 = GameWindow.states.States;
       GameState var2 = (GameState)var1.get(0);
       if (var2 instanceof TISLogoState) {
@@ -22,7 +25,7 @@ public class EtherLogo {
       } else {
          Logger.printLog("Error when initializing the EtherLogo!");
       }
-
+      */
    }
 
    public static EtherLogo getInstance() {

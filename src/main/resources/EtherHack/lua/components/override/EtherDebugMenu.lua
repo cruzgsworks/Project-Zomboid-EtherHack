@@ -4,6 +4,7 @@
 --***********************************************************
 
 require "ISUI/ISPanel"
+require "ISUI/AdminPanel/ISAdminPowerUI"
 
 EtherDebugMenu = ISPanel:derive("EtherDebugMenu");
 EtherDebugMenu.instance = nil;
@@ -14,7 +15,7 @@ EtherDebugMenu.tab = "MAIN"
 function EtherDebugMenu:setupButtons()
     -- MAIN
     self:addButtonInfo("General debuggers", function() ISGeneralDebug.OnOpenPanel() end, "MAIN");
-    self:addButtonInfo("Cheats", function() ISCheatPanelUI.OnOpenPanel() end, "MAIN");
+    self:addButtonInfo("Cheats", EtherDebugMenu.onClickCheats, "MAIN");
     self:addButtonInfo("Climate debuggers", function() ClimateControlDebug.OnOpenPanel() end, "MAIN");
     self:addButtonInfo("Player's Stats", function() ISPlayerStatsUI.OnOpenPanel() end, "MAIN");
     self:addButtonInfo("Items List", function() ISItemsListViewer.OnOpenPanel() end, "MAIN");
@@ -160,6 +161,22 @@ function EtherDebugMenu:onClick_Main()
         b:setVisible(true)
     end
     self:setHeight(self.mainTab._y+10);
+end
+
+function EtherDebugMenu.onClickCheats()
+    if isBypassDebugMode() then
+        ISAdminPowerUI.OnOpenPanel()
+    else
+        local modal = ISModalDialog:new(
+            getCore():getScreenWidth() / 2 - 200,
+            getCore():getScreenHeight() / 2 - 75,
+            400, 150,
+            "Enable 'Bypass debug mode prohibition' in the Exploit panel first",
+            false, nil, nil
+        );
+        modal:initialise();
+        modal:addToUIManager();
+    end
 end
 
 function EtherDebugMenu:onClick(_button)
